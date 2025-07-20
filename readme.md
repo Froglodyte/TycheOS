@@ -1,4 +1,4 @@
 
-# _TycheOS_
+# TycheOS
 A lightweight kernel and OS developed in C for CoC's Project X Mentorship Ptogram @ VJTI, Mumbai. \[WIP]
     
