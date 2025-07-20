@@ -1,6 +1,6 @@
 SECTIONS
 {
-    . = 0x8000;
+    . = 0x8000; /*RPi 3 starts the kernel at 0x8000 always*/
     
     .text.boot : { *(.text.boot) }
     .text : { *(.text) }
