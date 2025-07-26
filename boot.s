@@ -4,10 +4,10 @@
 _entry:
     mrs    x0, mpidr_el1        
     and    x0, x0,#0xFF
-    cbz    x0, master // primary core jumps to master
+    cbz    x0, init_bss // primary core jumps to master
     b    hang // hangs the other 3 cores
 
-master:
+init_bss:
     adr    x0, bss_begin
     adr    x1, bss_end
     sub    x1, x1, x0 // get bss size
