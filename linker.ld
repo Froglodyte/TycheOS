@@ -14,4 +14,10 @@ SECTIONS
         *(.bss)
         __bss_end = .;
     }
+
+    // removes comments and other useless info from the final image
+    /DISCARD/ : {
+        *(.comment)
+        *(.note.gnu.build-id)
+    }   
 }
