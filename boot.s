@@ -16,19 +16,11 @@ master:
     ldr x1, =__bss_end
     sub x1, x1, x0  // calculates bss size
 
-clear_bss:
+clear_bss_loop:
     cbz x1, jump_to_c
     str xzr, [x0], #8
     sub x1, x1, #8
-    b   check_bss
-
-check_bss:
-    cmp x0, x1
-    b.lo clear_bss_loop // if the current address is lower, loop again
-    bl main
-
-clear_bss_loop:
-    str xzr, [x0], #8
+    b   clear_bss_loop
 
 jump_to_c:
     bl main
@@ -38,6 +30,7 @@ hang:
     wfe
     b hang
 
+// halts main core when everything is done
 halt:
     wfi
     b halt
