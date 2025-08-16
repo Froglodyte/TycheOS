@@ -28,7 +28,7 @@ void uart_init() {
 
     // configure GPIO pins 14 and 15 to be UART pins (ALT0)
     uint32_t selector = *GPFSEL1;
-    selector &= ~((7 << 12) | (7 << 15)); //  clear bits 12-14 and 15-17
+    selector &= ~((7 << 12) | (7 << 15));
     selector |= (4 << 12) | (4 << 15);
     *GPFSEL1 = selector;
 
@@ -58,7 +58,7 @@ void uart_putc(char c) {
     *UART0_DR = c;
 }
 
-void uart_puts(const char* str) {
+void uart_puts(char* str) {
     for (int i = 0; str[i] != '\0'; i++) {
         uart_putc((unsigned char)str[i]);
     }
