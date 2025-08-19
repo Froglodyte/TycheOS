@@ -1,22 +1,6 @@
 #include <stdint.h>
-
-// peripheral base
-#define PERIPHERAL_BASE 0x3F000000
-
-// GPIO registers
-#define GPFSEL1    ((volatile uint32_t*)(PERIPHERAL_BASE + 0x00200004))
-#define GPPUD      ((volatile uint32_t*)(PERIPHERAL_BASE + 0x00200094))
-#define GPPUDCLK0  ((volatile uint32_t*)(PERIPHERAL_BASE + 0x00200098))
-
-// UART registers
-#define UART0_BASE (PERIPHERAL_BASE + 0x00201000)
-#define UART0_DR   ((volatile uint32_t*)(UART0_BASE + 0x00))
-#define UART0_FR   ((volatile uint32_t*)(UART0_BASE + 0x18))
-#define UART0_IBRD ((volatile uint32_t*)(UART0_BASE + 0x24))
-#define UART0_FBRD ((volatile uint32_t*)(UART0_BASE + 0x28))
-#define UART0_LCRH ((volatile uint32_t*)(UART0_BASE + 0x2C))
-#define UART0_CR   ((volatile uint32_t*)(UART0_BASE + 0x30))
-#define UART0_ICR  ((volatile uint32_t*)(UART0_BASE + 0x44))
+#include "gpio.h"
+#include "uart.h"
 
 void delay(int32_t count) {
     asm volatile("__delay_%=: subs %[count], %[count], #1; bne __delay_%=\n"
@@ -33,7 +17,7 @@ void uart_init() {
     *GPFSEL1 = selector;
 
     // disable pullup/down for pins 14 and 15
-    // this is some weird rpi3 thing and i dont understand it fully either lol
+    //RPi has a weird SoC, and you'll need to set the transistors to GND, MAXV or nothing using cycling
     *GPPUD = 0;
     delay(150);
     *GPPUDCLK0 = (1 << 14) | (1 << 15);
@@ -62,12 +46,4 @@ void uart_puts(char* str) {
     for (int i = 0; str[i] != '\0'; i++) {
         uart_putc((unsigned char)str[i]);
     }
-}
-
-void main() {
-    uart_init();
-    uart_puts("WAZZZUHHHHHH\r\n");
-
-    // kernel must not terminate
-    while (1) {}
 }
