@@ -2,9 +2,9 @@
 #include "gpio.h"
 #include "uart.h"
 
-void delay(int32_t count) {
-    asm volatile("__delay_%=: subs %[count], %[count], #1; bne __delay_%=\n"
-         : "=r"(count): [count]"0"(count) : "cc");
+void delay(int32_t ticks) {
+    asm volatile("__delay_%=: subs %[ticks], %[ticks], #1; bne __delay_%=\n"
+         : "=r"(ticks): [ticks]"0"(ticks) : "cc");
 }
 
 void uart_init() {
@@ -17,7 +17,7 @@ void uart_init() {
     *GPFSEL1 = selector;
 
     // disable pullup/down for pins 14 and 15
-    //RPi has a weird SoC, and you'll need to set the transistors to GND, MAXV or nothing using cycling
+    // RPi has a weird SoC, and you'll need to set the transistors to GND, MAXV or nothing using cycling
     *GPPUD = 0;
     delay(150);
     *GPPUDCLK0 = (1 << 14) | (1 << 15);
