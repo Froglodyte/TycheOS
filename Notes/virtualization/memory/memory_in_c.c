@@ -15,7 +15,7 @@ int main()
     printf("%d", sizeof(x)); // prints 8, not 40. Think how sizeof works!
     char *s = "Hello World";
     char *str = (char *)malloc(strlen(s) + 1); // be sure for the +1
-
+    
     // DE-ALLOCATING MEMORY (filled with problems) (garbage collector does this for you in higher level languages)
     //  Just cause it worked once, doesn't mean it would work again, these bugs require exhaustive testing
 
