@@ -26,7 +26,7 @@ jump_to_c:
     bl main
 
 // infinite recursion to hang the other 3 cores.
-hang: 
+hang:
     wfe
     b hang
 

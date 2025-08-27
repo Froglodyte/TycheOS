@@ -30,7 +30,7 @@ void uart_init() {
     // for some reason you cant tell the hardware you want a 115200 baud rate directly
     // you'll need to write two separate rates and let it do some fucked up calculations.
     *UART0_IBRD = 1; // baud rate (integer part)
-    *UART0_FBRD = 40; // baud rate (fractional part)
+    *UART0_FBRD = 40; // baud rate (fractional part)re GPIO pins 14 and 15 to be UART pins (A
 
     *UART0_LCRH = (1 << 4) | (1 << 5) | (1 << 6); // enable FIFO, 8 bit data
     *UART0_CR = (1 << 0) | (1 << 8) | (1 << 9); // enable UART, TX, RX
@@ -38,6 +38,7 @@ void uart_init() {
 
 void uart_putc(char c) {
     // wait for the UART to be ready to transmit
+    // 5th bit of the Flag Register (TXFF) is 1 if the FIFO is empty
     while (*UART0_FR & (1 << 5)) {}
     *UART0_DR = c;
 }
@@ -46,4 +47,11 @@ void uart_puts(char* str) {
     for (int i = 0; str[i] != '\0'; i++) {
         uart_putc((unsigned char)str[i]);
     }
+}
+
+char uart_getc() {
+    // wait for the receive FIFO to have room for a new char
+    // 4th bit of the Flag Register (RFXE) is 1 if the FIFO is empty
+    while (*UART0_FR & (1 << 4)) {}
+    return (char)(*UART0_DR);
 }

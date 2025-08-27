@@ -1,9 +1,10 @@
 #include <stdint.h>
 #include "uart.h"
+#include "shell.h"
 
 void main() {
     uart_init();
-    uart_puts("The Kernel Works!   \r\n");
+    shell();
 
     // kernel must not terminate
     while (1) {}
