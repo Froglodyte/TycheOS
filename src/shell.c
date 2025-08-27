@@ -14,7 +14,7 @@ void cmd_help() {
   uart_puts("TycheOS Shell Commands\r\n");
   uart_puts("  [1] help        - Display this help message\r\n");
   uart_puts("  [2] clear       - Clear the terminal screen\r\n");
-  uart_puts("  [3] echo [msg]  - Print [msg] back to the terminal\r\n");
+  uart_puts("  [3] echo [msg]  zq- Print [msg] back to the terminal\r\n");
   uart_puts("  [4] shutdown    - Shuts your device down\r\n");
   uart_puts("  [5] reboot      - Reboots your device\r\n");
 
