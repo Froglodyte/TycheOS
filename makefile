@@ -25,7 +25,7 @@ OBJECTS = $(C_OBJS) $(ASM_OBJS)
 
 # Compiler and Linker flags
 # We add -I$(INC_DIR) to tell GCC where to find headers.
-CFLAGS = -ffreestanding -O2 -nostdlib -Wall -Wextra -I$(INC_DIR)
+CFLAGS = -ffreestanding -O2 -nostdlib -Wall -Wextra -I$(INC_DIR) -mgeneral-regs-only
 LDFLAGS = -T linker.ld -nostdlib
 
 # Final output files
