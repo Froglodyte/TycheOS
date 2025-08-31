@@ -1,3 +1,9 @@
+.section ".bss"
+.align 16
+stack_bottom:
+.skip 16384  // allocate 16KB for the stack
+stack_top:
+
 .section ".text.boot"
 
 .globl _start
@@ -9,7 +15,7 @@ _start:
 
 master:
     // stack pointer
-    ldr x0, = _start
+    ldr x0, =stack_top
     mov sp, x0
 
     ldr x0, =__bss_start

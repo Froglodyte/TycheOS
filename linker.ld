@@ -15,6 +15,8 @@ SECTIONS
         __bss_end = .;
     }
 
+    _end = .;
+
     /*removes comments and other useless info from the final image*/
     /DISCARD/ : {
         *(.comment)
