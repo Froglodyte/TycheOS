@@ -1,4 +1,4 @@
-# Tools from the cross-compiler toolchain
+# Tools from the cross-compiler toolchain ("sudo apt install gcc-aarch64-linux-gnu")
 AS = aarch64-linux-gnu-as
 CC = aarch64-linux-gnu-gcc
 LD = aarch64-linux-gnu-ld
@@ -62,6 +62,6 @@ $(BUILD_DIR)/boot.o: boot.s
 clean:
 	rm -rf $(BUILD_DIR) $(KERNEL_IMG)
 
-# Build and run in QEMU
+# Build and run in QEMU (apt install qemu-system)
 run: all
 	qemu-system-aarch64 -M raspi3b -kernel $(KERNEL_IMG) -serial stdio

@@ -40,3 +40,4 @@ hang:
 halt:
     wfi
     b halt
+    
