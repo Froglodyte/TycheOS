@@ -5,7 +5,8 @@
 void delay(int32_t ticks);
 void uart_init();
 void uart_putc(char c);
-void uart_puts(char* str);
+void uart_puts(char *str);
 char uart_getc();
+void putc(void *p, char c);
 
 #endif
