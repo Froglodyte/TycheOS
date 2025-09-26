@@ -12,6 +12,8 @@ void main() {
     memory_init();
     uart_putc('\r\n');
     shell();
+    int el_code = get_el();
+    printf("The elcode is %d", el_code);    
 
     // kernel must not terminate
     while (1) {
