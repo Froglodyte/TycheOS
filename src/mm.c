@@ -31,6 +31,8 @@ void *malloc(size_t size) {
         return NULL;
     }
 
+    //disable_irq(); uncomment when it exists
+
     if (free_list_head == NULL) {
         // no free blocks left
         uart_puts("malloc: out of memory\r\n");
@@ -43,6 +45,8 @@ void *malloc(size_t size) {
     // move the head of the list to the next free block
     free_list_head = block_to_allocate->next;
 
+    //enable_irq(); uncomment when it exists
+
     // return a pointer to the usable memory area (after the header)
     return (void *)block_to_allocate;
 }
@@ -52,10 +56,14 @@ void free(void *ptr) {
         return;
     }
 
+    //disable_irq(); uncomment when it exists
+
     // cast the pointer back to our block header type
     header_t *block_to_free = (header_t *)ptr;
 
     // add the freed block to the front of the free list
     block_to_free->next = free_list_head;
     free_list_head = block_to_free;
+
+    //enable_irq(); uncomment when it exists
 }
