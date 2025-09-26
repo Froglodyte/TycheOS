@@ -2,7 +2,7 @@
 
 ## Data alignment and word size
 
--   Word size generally refers to the maximum no of bytes a register can hold at once. The memory is aligned in such a fashion that, to store a value, it must be aligned according to the word size boundaries, else it may cause perf issues or may even cause a CPU exception
+-   Word size generally signifies maximum no of bytes a register can hold at once. The memory is aligned in such a fashion that, to store a value, it must be aligned according to the word size boundaries, else it may cause perf issues or may even cause a CPU exception
 -   See structure padding and packing in C!
 -   Hence data must be aligned in the memory according to the word size. `.align`, `.p2align`, `.balign` directives help us achieve exactly this
 -   It is 64 bits for this project!
@@ -28,3 +28,18 @@ i'll do this later
 ## AAPCS (Procedure call standard for the ARM 64-bit architecture)
 
 Defines the ABI contract, which is the compiler toolchains follow to produce assembly code. I'll add upon this later. Strongly coupled with "Stack Pointer and Stack"
+
+
+## General Purpose Registers for x86 - 32 bits
+- Data Registers:
+    - EAX
+    - EBX
+    - ECX
+    - EDX
+- Index Registers:
+    - ESI
+    - EDI
+- Pointers:
+    - ESP
+    - EBP
+- Flags

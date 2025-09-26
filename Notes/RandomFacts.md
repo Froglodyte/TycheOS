@@ -37,5 +37,16 @@
 
 -   What does it mean for the architecure to be 64 bits?
     It generally means that the architecture supports registers that are capable of storing 64 bits at once. Generally also defines the Word Size which guides alignment of data in the memory.
+
     -   Does this mean the data bus is 64 bit? It does, but CPU architects do some extremely fancy stuff under-the-hood so making such a statement won't be perfectly precise. Again EE engineer's concern, ain't mine!
     -   What about the System bus? It makes sense for the system bus to have the ability to give 64 bits at once. Not sure if this is a requirement though. EE engineering is outright dark arts!
+
+-   Understanding Toolchain softwares:
+    -   Toolchain is a collection of tools/binaries that help compile .c/.cpp file into the object file
+    -   There are 3 main _attributes_ whilst talking about toolchains
+        -   Architecture: x86-64, ARM
+        -   OS: Linux, Windows, Mac
+        -   Runtime: GNU, MSVC (Not important and not always specified, forget rn)
+    -   Compiler is the crown jewel of a toolchain
+
+
