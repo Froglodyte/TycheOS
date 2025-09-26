@@ -34,8 +34,7 @@ void cmd_reboot() { uart_puts("ill implement this later\r\n"); }
 void run_cmd(const char *cmd) {
     if (strcmp(cmd, "help") == 0) {
         cmd_help();
-    } else if (cmd[0] == 'e' && cmd[1] == 'c' && cmd[2] == 'h' &&
-               cmd[3] == 'o') {
+    } else if (cmd[0] == 'e' && cmd[1] == 'c' && cmd[2] == 'h' && cmd[3] == 'o') {
         cmd_echo(cmd);
     } else if (strcmp(cmd, "shutdown") == 0) {
         cmd_shutdown();
