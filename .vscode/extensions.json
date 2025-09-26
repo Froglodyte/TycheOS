@@ -1,3 +1,7 @@
 {
-    "recommendations": ["zixuanwang.linkerscript", "dan-c-underwood.arm"]
+    "recommendations": [
+        "zixuanwang.linkerscript",
+        "dan-c-underwood.arm",
+        "mikhail-arkhipov.armassemblyeditor"
+    ]
 }

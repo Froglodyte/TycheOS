@@ -1,0 +1,15 @@
+{
+    // Enable C/C++ extension as default formatter
+    "[cpp]": {
+        "editor.defaultFormatter": "ms-vscode.cpptools"
+    },
+    "[c]": {
+        "editor.defaultFormatter": "ms-vscode.cpptools"
+    },
+    "[arm]": {
+        "editor.defaultFormatter": "Mikhail-Arkhipov.armassemblyeditor"
+    },
+
+    // ms-vscode uses LLVM formatter.
+    "C_Cpp.clang_format_style": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 100 }"
+}
