@@ -1,9 +1,13 @@
+#include "shell.h"
 #include "uart.h"
+#include "timer.h"
+#include <stdint.h>
 
-// added the strcmp function manually lmao
-// ill probably move this and a bunch of other utility fns into a separate file
-// later
-int strcmp(const char *s1, const char *s2) {
+// this external variable is defined in timer.c and holds the system tick count.
+extern volatile uint64_t timer_ticks;
+
+// string compare standard
+static int strcmp(const char *s1, const char *s2) {
     while (*s1 && (*s1 == *s2)) {
         s1++;
         s2++;
@@ -11,62 +15,114 @@ int strcmp(const char *s1, const char *s2) {
     return *(unsigned char *)s1 - *(unsigned char *)s2;
 }
 
-void cmd_help() {
-    uart_puts("TycheOS Shell Commands\r\n");
-    uart_puts("  [1] help        - Display this help message\r\n");
-    uart_puts("  [2] clear       - Clear the terminal screen\r\n");
-    uart_puts("  [3] echo [msg]  - Print [msg] back to the terminal\r\n");
+// string compare but for n characters
+static int strncmp(const char *s1, const char *s2, int n) {
+    while (n-- > 0) {
+        if (*s1 != *s2) {
+            return *(unsigned char *)s1 - *(unsigned char *)s2;
+        }
+        if (*s1 == '\0') {
+            break;
+        }
+        s1++;
+        s2++;
+    }
+    return 0;
 }
 
-void cmd_echo(const char *input) {
+// int to ascii, gotta reverse the string at the end
+static void itoa(uint64_t n, char* s) {
+    int i = 0;
+    do {
+        s[i++] = n % 10 + '0';
+    } while ((n /= 10) > 0);
+    s[i] = '\0';
+
+    // reverse
+    for (int j = 0, k = i - 1; j < k; j++, k--) {
+        char temp = s[j];
+        s[j] = s[k];
+        s[k] = temp;
+    }
+}
+
+
+static void cmd_help() {
+    uart_puts("TycheOS Shell Commands\r\n");
+    uart_puts("  help        - Display this help message\r\n");
+    uart_puts("  clear       - Clear the terminal screen\r\n");
+    uart_puts("  echo [msg]  - Print [msg] back to the terminal\r\n");
+    uart_puts("  tick        - Show the current system tick count\r\n");
+}
+
+static void cmd_echo(const char *input) {
     uart_puts(input + 5);
     uart_puts("\r\n");
 }
 
-void cmd_clear() { uart_puts("\033[2J\033[H"); }
+static void cmd_clear() {
+    uart_puts("\x1b[2J\x1b[H");
+}
 
-void run_cmd(const char *cmd) {
+static void cmd_tick() {
+    char tick_str[21]; // enough to hold 64-bit integer
+    itoa(timer_ticks, tick_str);
+    uart_puts("System ticks: ");
+    uart_puts(tick_str);
+    uart_puts("\r\n");
+}
+
+static void run_cmd(const char *cmd) {
     if (strcmp(cmd, "help") == 0) {
         cmd_help();
-    } else if (cmd[0] == 'e' && cmd[1] == 'c' && cmd[2] == 'h' && cmd[3] == 'o') {
+    } else if (strncmp(cmd, "echo ", 5) == 0) {
         cmd_echo(cmd);
-    } else if (strcmp(cmd, "shutdown") == 0) {
     } else if (strcmp(cmd, "clear") == 0) {
         cmd_clear();
+    } else if (strcmp(cmd, "tick") == 0) {
+        cmd_tick();
     } else {
-        uart_puts("Unknown Command :/\r\n");
+        uart_puts("Unknown Command: ");
+        uart_puts(cmd);
+        uart_puts("\r\n");
     }
 }
 
 void shell() {
-    uart_puts("TycheOS Shell\r\n> ");
+    uart_puts("\r\nTycheOS Shell\r\n");
+    uart_puts("> ");
 
-    char cmd[256];
-    int idx = 0;
+    char cmd_buffer[256];
+    int index = 0;
 
     while (1) {
         char c = uart_getc();
-        uart_putc(c);
 
         // backspace
         if (c == '\b' || c == 127) {
-            if (idx > 0) {
-                idx--;
+            if (index > 0) {
+                index--;
                 uart_puts("\b \b");
             }
         }
-
         // enter
-        if (c == '\r') {
-            cmd[idx] = '\0';
+        else if (c == '\r') {
+            cmd_buffer[index] = '\0';
             uart_puts("\r\n");
 
-            run_cmd(cmd);
+            if (index > 0) {
+                run_cmd(cmd_buffer);
+            }
 
             uart_puts("> ");
-            idx = 0;
-        } else {
-            cmd[idx++] = c;
+            index = 0; // reset for the next command
+        }
+        else {
+            // make sure we don't overflow the buffer
+            if (index < sizeof(cmd_buffer) - 1) {
+                cmd_buffer[index++] = c;
+                uart_putc(c);
+            }
         }
     }
 }

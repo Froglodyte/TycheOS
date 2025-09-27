@@ -5,6 +5,8 @@
 // address is an offset from the peripheral base
 #define CORE0_TIMER_IRQ_CTRL 0x40000040
 
+volatile uint64_t timer_ticks = 0;
+
 void timer_init() {
     // read the clock frequency from the system register
     // and set timer value for the next interrupt
@@ -18,8 +20,7 @@ void timer_init() {
 }
 
 void handle_timer_irq() {
-    uart_puts(" [tick] ");
-
+    timer_ticks++;
     // reset the timer for the next interrupt
     asm volatile("mrs x0, cntfrq_el0; msr cntp_tval_el0, x0");
 }

@@ -4,10 +4,12 @@
 #include "printf.h"
 #include "shell.h"
 #include "uart.h"
+#include "timer.h"
 
 void main() {
     uart_init();
     init_printf(0, putc);
+    timer_init();
     //irq_vector_init();
     //enable_interrupt_controller();
     //enable_irq();
