@@ -2,16 +2,15 @@
 #define GPIO_H
 #include <stdint.h>
 
-// peripheral base
-#define PERIPHERAL_BASE 0x3F000000
+#include "peripherals/base.h"
 
 // GPIO registers
-#define GPFSEL1 ((volatile uint32_t*)(PERIPHERAL_BASE + 0x00200004))
-#define GPPUD ((volatile uint32_t*)(PERIPHERAL_BASE + 0x00200094))
-#define GPPUDCLK0 ((volatile uint32_t*)(PERIPHERAL_BASE + 0x00200098))
+#define GPFSEL1 ((volatile uint32_t*)(PBASE + 0x00200004))
+#define GPPUD ((volatile uint32_t*)(PBASE + 0x00200094))
+#define GPPUDCLK0 ((volatile uint32_t*)(PBASE + 0x00200098))
 
 // UART registers
-#define UART0_BASE (PERIPHERAL_BASE + 0x00201000)
+#define UART0_BASE (PBASE + 0x00201000)
 #define UART0_DR ((volatile uint32_t*)(UART0_BASE + 0x00))    // Data Register
 #define UART0_FR ((volatile uint32_t*)(UART0_BASE + 0x18))    // Flag Register
 #define UART0_IBRD ((volatile uint32_t*)(UART0_BASE + 0x24))  // Integer Baud Rate

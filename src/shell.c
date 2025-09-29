@@ -1,10 +1,12 @@
+
 #include "shell.h"
-#include "uart.h"
-#include "timer.h"
+
 #include <stdint.h>
 
+#include "uart.h"
+
 // this external variable is defined in timer.c and holds the system tick count.
-extern volatile uint64_t timer_ticks;
+// extern volatile uint64_t timer_ticks;
 
 // string compare standard
 static int strcmp(const char *s1, const char *s2) {
@@ -31,7 +33,7 @@ static int strncmp(const char *s1, const char *s2, int n) {
 }
 
 // int to ascii, gotta reverse the string at the end
-static void itoa(uint64_t n, char* s) {
+static void itoa(uint64_t n, char *s) {
     int i = 0;
     do {
         s[i++] = n % 10 + '0';
@@ -46,7 +48,6 @@ static void itoa(uint64_t n, char* s) {
     }
 }
 
-
 static void cmd_help() {
     uart_puts("TycheOS Shell Commands\r\n");
     uart_puts("  help        - Display this help message\r\n");
@@ -60,13 +61,11 @@ static void cmd_echo(const char *input) {
     uart_puts("\r\n");
 }
 
-static void cmd_clear() {
-    uart_puts("\x1b[2J\x1b[H");
-}
+static void cmd_clear() { uart_puts("\x1b[2J\x1b[H"); }
 
 static void cmd_tick() {
-    char tick_str[21]; // enough to hold 64-bit integer
-    itoa(timer_ticks, tick_str);
+    char tick_str[21];  // enough to hold 64-bit integer
+    // itoa(timer_ticks, tick_str);
     uart_puts("System ticks: ");
     uart_puts(tick_str);
     uart_puts("\r\n");
@@ -115,9 +114,8 @@ void shell() {
             }
 
             uart_puts("> ");
-            index = 0; // reset for the next command
-        }
-        else {
+            index = 0;  // reset for the next command
+        } else {
             // make sure we don't overflow the buffer
             if (index < sizeof(cmd_buffer) - 1) {
                 cmd_buffer[index++] = c;

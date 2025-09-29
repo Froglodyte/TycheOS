@@ -1,5 +1,5 @@
-#ifndef _ENTRY_H
-#define _ENTRY_H
+#ifndef PENTRY
+#define PENTRY
 
 #define S_FRAME_SIZE 256
 

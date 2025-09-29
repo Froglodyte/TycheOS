@@ -54,4 +54,5 @@ clean:
 
 # Build and run in QEMU (apt install qemu-system)
 run: all
-	qemu-system-aarch64 -M raspi3b -kernel $(KERNEL_IMG) -serial stdio
+# 	qemu-system-aarch64 -M raspi3b -device loader,file=$(KERNEL_IMG) -serial stdio
+	qemu-system-aarch64 -M raspi3b -device loader,file=$(KERNEL_IMG) -serial stdio -display none

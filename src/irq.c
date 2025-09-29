@@ -1,5 +1,8 @@
-#include "peripherals.h"
+#include "peripherals/irq.h"
+
 #include "printf.h"
+#include "timer.h"
+#include "utils.h"
 
 const char *entry_error_messages[] = {
     "SYNC_INVALID_EL1t",   "IRQ_INVALID_EL1t",   "FIQ_INVALID_EL1t",   "ERROR_INVALID_EL1t",
@@ -14,9 +17,17 @@ void show_invalid_entry_message(int type, unsigned long esr, unsigned long addre
     printf("%s, ESR: %x, address: %x\r\n", entry_error_messages[type], esr, address);
 }
 
-void enable_interrupt_controller() { put32(ENABLE_IRQS_1, SYSTEM_TIMER_IRQ_1); }
+void enable_interrupt_controller() {
+    put32(ENABLE_IRQS_1, SYSTEM_TIMER_IRQ_1);
+}
 
 void handle_irq(void) {
     unsigned int irq = get32(IRQ_PENDING_1);
-    printf(irq);
+    switch (irq) {
+        case (SYSTEM_TIMER_IRQ_1):
+            handle_timer_irq();
+            break;
+        default:
+            printf("Unknown pending irq: %x\r\n", irq);
+    }
 }

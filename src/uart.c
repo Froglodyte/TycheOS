@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#include "gpio.h"
+#include "peripherals/gpio.h"
 
 void delay(int32_t ticks) {
     asm volatile("__delay_%=: subs %[ticks], %[ticks], #1; bne __delay_%=\n"

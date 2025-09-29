@@ -1,8 +1,7 @@
-// These are all standard addresses picked from ARM address manual
-#ifndef P_BASE
-#define P_BASE
+#ifndef PIRQ
+#define PIRQ
 
-#define PBASE 0x3F000000
+#include "peripherals/base.h"
 
 #define IRQ_BASIC_PENDING (PBASE + 0x0000B200)
 #define IRQ_PENDING_1 (PBASE + 0x0000B204)
@@ -20,4 +19,4 @@
 #define SYSTEM_TIMER_IRQ_2 (1 << 2)
 #define SYSTEM_TIMER_IRQ_3 (1 << 3)
 
-#endif
+#endif /*_P_IRQ_H */

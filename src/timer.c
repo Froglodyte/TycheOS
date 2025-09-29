@@ -1,26 +1,22 @@
-#include "timer.h"
-#include "uart.h"
+#include "peripherals/timer.h"
 
-// private peripheral timer for the ARM CPU [NOT global]
-// address is an offset from the peripheral base
-#define CORE0_TIMER_IRQ_CTRL 0x40000040
+#include "printf.h"
+#include "utils.h"
 
-volatile uint64_t timer_ticks = 0;
+const unsigned int interval = 200000;
 
-void timer_init() {
-    // read the clock frequency from the system register
-    // and set timer value for the next interrupt
-    asm volatile("mrs x0, cntfrq_el0; msr cntp_tval_el0, x0");
+// unsigned integers have no overflow problem
+unsigned int curVal = 0;
 
-    // enable the timer
-    asm volatile("msr cntp_ctl_el0, %0" : : "r" (1));
-
-    // enable timer interrupts for core 0
-    *(unsigned int*)CORE0_TIMER_IRQ_CTRL = 1;
+void timer_init(void) {
+    curVal = get32(TIMER_CLO);
+    curVal += interval;
+    put32(TIMER_C1, curVal);
 }
 
-void handle_timer_irq() {
-    timer_ticks++;
-    // reset the timer for the next interrupt
-    asm volatile("mrs x0, cntfrq_el0; msr cntp_tval_el0, x0");
+void handle_timer_irq(void) {
+    curVal += interval;
+    put32(TIMER_C1, curVal);
+    put32(TIMER_CS, TIMER_CS_M1);
+    // printf("Timer interrupt received\n\r");
 }

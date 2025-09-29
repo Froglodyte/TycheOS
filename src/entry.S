@@ -67,7 +67,7 @@ vectors:
     ventry error_invalid_el1t                           // Error EL1t
 
     ventry sync_invalid_el1h                            // Synchronous EL1h
-    ventry el1_irq                                      // IRQ EL1h (The only one we are supporting atm)
+    ventry el1_irq                                      // IRQ EL1h
     ventry fiq_invalid_el1h                             // FIQ EL1h
     ventry error_invalid_el1h                           // Error EL1h
 
@@ -134,19 +134,3 @@ el1_irq:
 .globl err_hang
 err_hang:
     b err_hang
-
-.globl irq_vector_init
-irq_vector_init:
-    adr x0, vectors
-    msr vbar_el1, x0
-    ret
-
-.globl enable_irq
-enable_irq:
-    msr daifclr, #2
-    ret
-
-.globl disable_irq
-disable_irq:
-    msr daifset, #2
-    ret

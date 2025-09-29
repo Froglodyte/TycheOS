@@ -1,6 +1,7 @@
 SECTIONS
 {
-    . = 0x80000; /*RPi 3 starts the kernel at 0x80000 always*/
+    /* RPi 3 starts the kernel at 0x80000 always */
+    /* . = 0x80000;  */
     . = ALIGN(8);
     
     .text.boot : { *(.text.boot) }
