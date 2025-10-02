@@ -5,48 +5,7 @@
 
 #include "uart.h"
 
-// this external variable is defined in timer.c and holds the system tick count.
-// extern volatile uint64_t timer_ticks;
-
-// string compare standard
-static int strcmp(const char *s1, const char *s2) {
-    while (*s1 && (*s1 == *s2)) {
-        s1++;
-        s2++;
-    }
-    return *(unsigned char *)s1 - *(unsigned char *)s2;
-}
-
-// string compare but for n characters
-static int strncmp(const char *s1, const char *s2, int n) {
-    while (n-- > 0) {
-        if (*s1 != *s2) {
-            return *(unsigned char *)s1 - *(unsigned char *)s2;
-        }
-        if (*s1 == '\0') {
-            break;
-        }
-        s1++;
-        s2++;
-    }
-    return 0;
-}
-
-// int to ascii, gotta reverse the string at the end
-static void itoa(uint64_t n, char *s) {
-    int i = 0;
-    do {
-        s[i++] = n % 10 + '0';
-    } while ((n /= 10) > 0);
-    s[i] = '\0';
-
-    // reverse
-    for (int j = 0, k = i - 1; j < k; j++, k--) {
-        char temp = s[j];
-        s[j] = s[k];
-        s[k] = temp;
-    }
-}
+#include "string.h"
 
 static void cmd_help() {
     uart_puts("TycheOS Shell Commands\r\n");
