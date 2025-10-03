@@ -1,10 +1,13 @@
+# Translation units, ODR and how code sharing works in C/C++ codebases!
+
 ## Translation Units
 
--   Every C/C++ program is made up of various translation units (.cpp files).
--   The linker does the job of knitting them together
+-   Every C/C++ program is made up of various translation units.
+-   A translation unit is nothing but a .c/.cpp file!
+-   The linker does the job of knitting these files together
 -   All the translation units share the same global scope
 -   Translation units allow one to separate code into independent files.
--   But there exists no good mechanism for code-sharing
+-   But there exists no straight-forward mechanism for code-sharing like in modern programming languages!
 
 ## Code Sharing Conundrum
 
@@ -66,7 +69,7 @@
         };
 
         void cube(int a) {
-            std::cout << (a*a) << std::endl;
+            std::cout << (a*a*a) << std::endl;
         };
 
         void identity(int a) {
@@ -106,7 +109,7 @@
         };
 
         void cube(int a) {
-            std::cout << (a*a) << std::endl;
+            std::cout << (a*a*a) << std::endl;
         };
 
         void identity(int a) {
@@ -126,7 +129,7 @@
         +   std::cout << (a*a) << std::endl;
         + };
         + void cube(int a) {
-        +   std::cout << (a*a) << std::endl;
+        +   std::cout << (a*a*a) << std::endl;
         + };
         + void identity(int a) {
         +   std::cout << a << std::endl;
@@ -146,7 +149,7 @@
         +   std::cout << (a*a) << std::endl;
         + };
         + void cube(int a) {
-        +   std::cout << (a*a) << std::endl;
+        +   std::cout << (a*a*a) << std::endl;
         + };
         + void identity(int a) {
         +   std::cout << a << std::endl;
@@ -158,7 +161,7 @@
         }
         ```
 
-    -   The `compiler` does not mind this, but the `linker` is mad for two files now have two independent yet same **definitions** of the utils function.
+    -   The `compiler` does not mind this, but the `linker` is mad for two files now have two independent yet same **definitions** of the _utils function_.
 
     -   Recall, all translation units share their global scope, thus having multiple definitions is a problem!
 
@@ -176,15 +179,14 @@
 -   **External linkage** means visibility across all translation units.
 -   If something is defined in local scope, it has **No Linkage**
 -   Linkage directives:
-    -   By default everything in global scope is external linkage
-    -   If `static` keyword is used it means internal linkage
-    -   If `inline` keyword is used it means external linkage
-    -   If `const` or `constexpr` is used
-        -   If it is function it is _still_ external linkage
+    -   `default`(nothing specified) and defined in global scope => external linkage
+    -   `static` => internal linkage
+    -   `inline` => external linkage
+    -   `const` or `constexpr`:
+        -   When used along with function it is _still_ external linkage
         -   Else internal linkage
-    -   `extern` keyword makes stuff external linkage. Pretty redundant on its own (cause stuff is already external linkage). Useful when used
-        along with `const` ig (in c++ only mostly)
--   Note: By _stuff_ I mean templates, types, functions, structs, classes. (I haven't cared to study for unions and namespace cases)
+    -   `extern` keyword makes stuff external linkage. Pretty redundant on its own (cause stuff is already external linkage). Useful when used along with `const` ig (in c++ only mostly)
+-   **Note: By _stuff_ I mean templates, types, functions, structs, classes. (I haven't cared to study for unions and namespace cases)**
 
 ## Solving Code-Sharing with Header files and Linkage Directives (some common patterns)
 
@@ -194,9 +196,64 @@
         is extracted into one.
     -   This allows one to define stuff in `header` files and #include them various .cpp files (translation units).
     -   Doing so without `inline` keyword would make the linker complain for multiple definitions
-    -   Using `static` keyword in this case solves the problem too, but increases memory print, cause every translation unit now has its own copy
+    -   Using `static` keyword in this case solves the problem too (makes all functions visible only to their translation unit), but increases memory print, cause every translation unit now has its own copy
     -   `inline` keyword solves both this problem
+    -   `utils.h`
+
+        ```cpp
+        #include <iostream>
+
+        inline void square(int a) {
+            std::cout << (a*a) << std::endl;
+        };
+
+        inline void cube(int a) {
+            std::cout << (a*a*a) << std::endl;
+        };
+
+        inline void identity(int a) {
+            std::cout << a << std::endl;
+        };
+        ```
 
 -   `extern` keyword:
+
     -   `extern` keyword is used to signify there exists a definition of the `declaration` somewhere.
-    -   Other way to allow one to define common code into .h files is to include _declarations_ in these files and create a single translation unit where this stuff is actually _defined_
+    -   `utils.h`
+
+        ```cpp
+        #include <iostream>
+
+        extern void square(int a) {
+            std::cout << (a*a) << std::endl;
+        };
+
+        extern void cube(int a) {
+            std::cout << (a*a*a) << std::endl;
+        };
+
+        extern void identity(int a) {
+            std::cout << a << std::endl;
+        };
+        ```
+
+    -   `utils.cpp`
+
+    ```cpp
+        #include <iostream>
+
+        void square(int a) {
+            std::cout << (a*a) << std::endl;
+        };
+
+        void cube(int a) {
+            std::cout << (a*a*a) << std::endl;
+        };
+
+        void identity(int a) {
+            std::cout << a << std::endl;
+        };
+    ```
+
+    -   This basically means not to ask the question `Why keep `utils.cpp` file at all?`. Here the `extern` keyword can be dropped too!
+    -   Might cause some cluterring as the number of header files increase, but hey it works!
