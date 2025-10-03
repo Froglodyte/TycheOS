@@ -1,8 +1,8 @@
-# Translation units, ODR and how code sharing works in C/C++ codebases!
+# Translation units, ODR and how code sharing works in C++ codebases!
 
 ## Translation Units
 
--   Every C/C++ program is made up of various translation units.
+-   Every C++ program is made up of various translation units.
 -   A translation unit is nothing but a .c/.cpp file!
 -   The linker does the job of knitting these files together
 -   All the translation units share the same global scope
@@ -94,7 +94,7 @@
         }
         ```
     -   The **declarations** of the util functions are written in `utils.h` but the **definition** is present in `utils.cpp` file
-    -   This is the basic mechanism for code-sharing in C/C++ codebases.
+    -   This is the basic mechanism for code-sharing in C++ codebases.
 
 -   ### Why keep `utils.cpp` file at all?
 
