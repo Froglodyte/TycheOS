@@ -1,69 +1,17 @@
 #include "mm.h"
 
-#include "uart.h"
+static unsigned short mem_map[PAGING_PAGES] = {0};
 
-// size and number of memory blocks
-#define BLOCK_SIZE 64
-#define NUM_BLOCKS 1024  // 64KB of heap memory
-
-// memory is treated like a linked list.
-// each block of memory is a node
-typedef struct header {
-    struct header *next;
-} header_t;
-
-static header_t memory_map[NUM_BLOCKS];
-static header_t *free_list_head = NULL;
-
-void memory_init() {
-    for (int i = 0; i < NUM_BLOCKS - 1; i++) {
-        memory_map[i].next = &memory_map[i + 1];
+unsigned long get_free_page() {
+    for (int i = 0; i < PAGING_PAGES; i++) {
+        if (mem_map[i] == 0) {
+            mem_map[i] = 1;
+            return LOW_MEMORY + i * PAGE_SIZE;
+        }
     }
-    memory_map[NUM_BLOCKS - 1].next = NULL;
-
-    free_list_head = &memory_map[0];
-    uart_puts("memory_init: initialized memory\r\n");
 }
 
-void *malloc(size_t size) {
-    if (size > BLOCK_SIZE || size == 0) {
-        // can't allocate more than a block or zero bytes
-        return NULL;
-    }
-
-    // disable_irq(); uncomment when it exists
-
-    if (free_list_head == NULL) {
-        // no free blocks left
-        uart_puts("malloc: out of memory\r\n");
-        return NULL;
-    }
-
-    // get a block from the front of the free list
-    header_t *block_to_allocate = free_list_head;
-
-    // move the head of the list to the next free block
-    free_list_head = block_to_allocate->next;
-
-    // enable_irq(); uncomment when it exists
-
-    // return a pointer to the usable memory area (after the header)
-    return (void *)block_to_allocate;
-}
-
-void free(void *ptr) {
-    if (ptr == NULL) {
-        return;
-    }
-
-    // disable_irq(); uncomment when it exists
-
-    // cast the pointer back to our block header type
-    header_t *block_to_free = (header_t *)ptr;
-
-    // add the freed block to the front of the free list
-    block_to_free->next = free_list_head;
-    free_list_head = block_to_free;
-
-    // enable_irq(); uncomment when it exists
+void free_page(unsigned long p) {
+    int i = (p - LOW_MEMORY) / PAGE_SIZE;
+    mem_map[i] = 0;
 }
