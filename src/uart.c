@@ -51,7 +51,7 @@ void uart_putc(char c) {
     *UART0_DR = c;
 }
 
-void uart_puts(char *str) {
+void uart_puts(const char *str) {
     for (int i = 0; str[i] != '\0'; i++) {
         uart_putc((unsigned char)str[i]);
     }

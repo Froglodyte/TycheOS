@@ -60,3 +60,49 @@ char* strncpy(char *dest, const char *src, int n) {
     }
     return dest;
 }
+
+char* strcpy(char* dest, const char* src) {
+    char* saved_dest = dest;
+    while ((*dest++ = *src++));
+    return saved_dest;
+}
+
+char* strtok(char* str, const char* delim) {
+    static char* last;
+    if (str)
+        last = str;
+    if (!last || *last == '\0')
+        return 0;
+    char* token = last;
+    while (*last != '\0') {
+        const char* d = delim;
+        while (*d != '\0') {
+            if (*last == *d++) {
+                *last++ = '\0';
+                return token;
+            }
+        }
+        last++;
+    }
+    return token;
+}
+
+const char* strrchr(const char* s, int c) {
+    const char* last = 0;
+    while (*s) {
+        if (*s == c) {
+            last = s;
+        }
+        s++;
+    }
+    return last;
+}
+
+char* strchr(const char* s, int c) {
+    while (*s != (char)c) {
+        if (!*s++) {
+            return 0;
+        }
+    }
+    return (char*)s;
+}
