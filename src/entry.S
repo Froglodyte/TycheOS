@@ -52,7 +52,7 @@
     ldp x28, x29, [sp, #16*14]
     ldr x30, [sp, #16*15]
     add sp, sp, #S_FRAME_SIZE
-    eret
+    eret // NOTE THE ERET, we need it to return back to the correct address
 .endm
 
 /*

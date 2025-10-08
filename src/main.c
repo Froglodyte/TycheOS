@@ -1,12 +1,23 @@
 #include <stdint.h>
 
+#include "fork.h"
 #include "irq.h"
 #include "mm.h"
 #include "printf.h"
+#include "scheduler.h"
 #include "shell.h"
 #include "timer.h"
 #include "uart.h"
 #include "utils.h"
+
+void process(char *array) {
+    while (1) {
+        for (int i = 0; i < 5; i++) {
+            uart_putc(array[i]);
+            delay(100000);
+        }
+    }
+}
 
 void main() {
     uart_init();
@@ -17,10 +28,21 @@ void main() {
     timer_init();
     enable_interrupt_controller();
     enable_irq();
-    memory_init();
+    // memory_init();
     uart_putc('\r\n');
-    shell();
+    // shell();
+    int res = copy_process((unsigned long)&process, (unsigned long)"12345");
+    if (res != 0) {
+        printf("error while starting process 1");
+        return;
+    }
+    res = copy_process((unsigned long)&process, (unsigned long)"abcde");
+    if (res != 0) {
+        printf("error while starting process 2");
+        return;
+    }
     // kernel must not terminate
     while (1) {
+        schedule();
     }
 }

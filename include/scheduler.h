@@ -10,6 +10,9 @@
 
 // x19 to x28 are callee saved
 // x9 to x15 are caller saved
+/**
+ * The order of the fields is extremely important cause cpu_switch_to depends on it!
+ */
 struct cpu_ctx {
     unsigned long x19;
     unsigned long x20;
@@ -22,8 +25,8 @@ struct cpu_ctx {
     unsigned long x27;
     unsigned long x28;
     unsigned long fp;  // x29
+    unsigned long sp;  // special register of sorts like the XZR
     unsigned long lr;  // x30 (Link register)
-    unsigned long sp;  // kinda like the XZR register
 };
 
 struct task_struct {
@@ -40,6 +43,7 @@ extern task_struct *tasks[NR_TASKS];
 extern int curr_task;
 
 extern void sched_init(void);
+extern void _schedule(void);
 extern void schedule(void);
 extern void timer_tick(void);
 extern void preempt_disable(void);
