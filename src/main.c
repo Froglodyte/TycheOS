@@ -9,6 +9,7 @@
 #include "timer.h"
 #include "uart.h"
 #include "utils.h"
+#include "fs.h"
 
 void process(char *array) {
     while (1) {
@@ -28,19 +29,11 @@ void main() {
     timer_init();
     enable_interrupt_controller();
     enable_irq();
-    // memory_init();
-    uart_putc('\r\n');
-    // shell();
-    int res = copy_process((unsigned long)&process, (unsigned long)"12345");
-    if (res != 0) {
-        printf("error while starting process 1");
-        return;
-    }
-    res = copy_process((unsigned long)&process, (unsigned long)"abcde");
-    if (res != 0) {
-        printf("error while starting process 2");
-        return;
-    }
+    memory_init();
+    vfs_init();
+    uart_putc('\r');
+    uart_putc('\n');
+    shell();
     // kernel must not terminate
     while (1) {
         schedule();

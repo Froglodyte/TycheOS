@@ -2,6 +2,23 @@
 
 #include <stdint.h>
 
+void* memcpy(void* dest, const void* src, unsigned int n) {
+    char* d = dest;
+    const char* s = src;
+    while (n--) {
+        *d++ = *s++;
+    }
+    return dest;
+}
+
+void* memset(void* s, int c, unsigned int n) {
+    char* p = s;
+    while (n--) {
+        *p++ = (char)c;
+    }
+    return s;
+}
+
 // string compare standard
 int strcmp(const char *s1, const char *s2) {
     while (*s1 && (*s1 == *s2)) {
@@ -65,6 +82,15 @@ char* strcpy(char* dest, const char* src) {
     char* saved_dest = dest;
     while ((*dest++ = *src++));
     return saved_dest;
+}
+
+char* strcat(char* dest, const char* src) {
+    char* ptr = dest + strlen(dest);
+    while (*src != '\0') {
+        *ptr++ = *src++;
+    }
+    *ptr = '\0';
+    return dest;
 }
 
 char* strtok(char* str, const char* delim) {

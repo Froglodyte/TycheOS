@@ -28,6 +28,11 @@
 unsigned long get_free_page();
 void free_page(unsigned long p);
 void memzero(unsigned long src, unsigned long n);
+void memory_init();
+void* malloc(size_t size);
+void free(void* ptr);
+void* kmalloc(size_t size);
+void kfree(void* ptr);
 
 #endif
 
