@@ -41,11 +41,11 @@ void free_page(unsigned long p) {
 }
 
 void* kmalloc(size_t size) {
-    // Align the size to a multiple of 8
+    // align the size to a multiple of 8
     size = (size + 7) & ~7;
 
     if (heap_ptr + size > kernel_heap + KERNEL_HEAP_SIZE) {
-        return NULL; // Out of memory
+        return NULL; // out of memory
     }
 
     void* ptr = heap_ptr;
@@ -54,9 +54,5 @@ void* kmalloc(size_t size) {
 }
 
 void kfree(void* ptr) {
-    // With a bump allocator, we can't easily free individual blocks.
-    // A simple implementation is to do nothing.
-    // A more complex one would be to reset the heap_ptr, but that
-    // would invalidate all previous allocations.
-    (void)ptr; // Avoid unused parameter warning
+    (void)ptr;
 }
