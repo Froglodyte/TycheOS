@@ -2,6 +2,7 @@
     "recommendations": [
         "zixuanwang.linkerscript",
         "dan-c-underwood.arm",
-        "mikhail-arkhipov.armassemblyeditor"
+        "mikhail-arkhipov.armassemblyeditor",
+        "ms-vscode.makefile-tools"
     ]
 }

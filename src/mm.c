@@ -18,16 +18,15 @@ unsigned long get_free_page() {
 // memory is treated like a linked list.
 // each block of memory is a node
 typedef struct header {
-    struct header *next;
+    struct header* next;
 } header_t;
 
 static header_t memory_map[NUM_BLOCKS];
-static header_t *free_list_head = NULL;
+static header_t* free_list_head = NULL;
 
 #define KERNEL_HEAP_SIZE (64 * 1024)
 static char kernel_heap[KERNEL_HEAP_SIZE];
 static char* heap_ptr = kernel_heap;
-
 
 void memory_init() {
     for (int i = 0; i < NUM_BLOCKS - 1; i++) {
@@ -45,7 +44,7 @@ void* kmalloc(size_t size) {
     size = (size + 7) & ~7;
 
     if (heap_ptr + size > kernel_heap + KERNEL_HEAP_SIZE) {
-        return NULL; // out of memory
+        return NULL;  // out of memory
     }
 
     void* ptr = heap_ptr;
@@ -53,6 +52,4 @@ void* kmalloc(size_t size) {
     return ptr;
 }
 
-void kfree(void* ptr) {
-    (void)ptr;
-}
+void kfree(void* ptr) { (void)ptr; }

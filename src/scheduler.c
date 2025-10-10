@@ -50,10 +50,11 @@ void schedule(void) {
 }
 
 void switch_to(struct task_struct* next) {
-    if (current == next) return;
+    if (current == next)
+        return;
     struct task_struct* prev = current;
     current = next;
-    cpu_switch_to(prev, next); 
+    cpu_switch_to(prev, next);
 }
 
 void schedule_tail() { preempt_enable(); }

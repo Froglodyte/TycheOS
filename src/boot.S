@@ -1,10 +1,5 @@
 #include "arm/sysregs.h"
-
-.section ".bss"
-.align 16
-stack_bottom:
-    .skip 16384 // allocate 16KB for the kernel stack
-stack_top:
+#include "mm.h"
 
 .section ".text.boot"
 
@@ -39,9 +34,8 @@ el1_entry:
     sub x1, x1, x0
     bl memzero
 
-    ldr x0, =stack_top
-    mov sp, x0
-
+    mov sp, #LOW_MEMORY
+    
     bl main
     b hang // should never reach here
 
