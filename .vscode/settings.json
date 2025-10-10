@@ -11,5 +11,5 @@
     },
 
     // ms-vscode uses LLVM formatter.
-    "C_Cpp.clang_format_style": "{ BasedOnStyle: Google, AllowShortIfStatementsOnASingleLine: Never, AllowShortLoopsOnASingleLine: false, BreakBeforeBraces: Attach, IndentWidth: 4, PointerAlignment: Left, UseTab: Never }"
+    "C_Cpp.clang_format_style": "{ BasedOnStyle: Google, AllowShortIfStatementsOnASingleLine: Never, AllowShortLoopsOnASingleLine: false, BreakBeforeBraces: Attach, IndentWidth: 4, PointerAlignment: Left, UseTab: Never, ColumnLimit: 100 }"
 }
