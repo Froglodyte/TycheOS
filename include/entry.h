@@ -1,7 +1,7 @@
 #ifndef PENTRY
 #define PENTRY
 
-#define S_FRAME_SIZE 256
+#define S_FRAME_SIZE 272
 
 #define SYNC_INVALID_EL1t 0
 #define IRQ_INVALID_EL1t 1
