@@ -7,6 +7,7 @@
 #define THREAD_SIZE PAGE_SIZE  // 4KB
 #define NR_TASKS 64
 #define TASK_RUNNING 0
+#define PF_KTHREAD 0x00000002
 
 // x19 to x28 are callee saved
 // x9 to x15 are caller saved
@@ -35,6 +36,8 @@ struct task_struct {
     long counter;        // how long can this process still run for
     long priority;       // counter = priority
     long preempt_count;  // can this be pre-empted. If non-zero we can't!
+    unsigned long stack;
+    unsigned long flags;
 };
 typedef struct task_struct task_struct;
 
