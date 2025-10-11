@@ -33,8 +33,8 @@ void main() {
     vfs_init();
     uart_putc('\r');
     uart_putc('\n');
-    copy_process((unsigned long)process, (unsigned long)"12345");
-    copy_process((unsigned long)process, (unsigned long)"abcde");
+    // copy_process((unsigned long)process, (unsigned long)"12345");
+    // copy_process((unsigned long)process, (unsigned long)"abcde");
     shell();
     // kernel must not terminate
     while (1) {

@@ -2,6 +2,7 @@
 #define PENTRY
 
 #define S_FRAME_SIZE 272
+#define S_X0 0  // offset of x0 register in saved stack frame
 
 #define SYNC_INVALID_EL1t 0
 #define IRQ_INVALID_EL1t 1

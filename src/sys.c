@@ -16,6 +16,8 @@ unsigned long sys_malloc() {
     return addr;
 }
 
-void sys_exit() { exit_process(); }
+void sys_exit() {
+    // exit_process();
+}
 
 void* const sys_call_table[] = {sys_write, sys_malloc, sys_clone, sys_exit};

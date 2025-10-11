@@ -169,12 +169,12 @@ el0_sync:
     handle_invalid_entry 0, SYNC_ERROR
 
 el0_svc:
-    nr_sc .req x25
-    sc_no .req x26
-    syscall_table_ptr .req x27
+    sc_nr .req x25
+    scno .req x26
+    stbl .req x27
     adr stbl, sys_call_table // load syscall table pointer
     uxtw scno, w8 // syscall number in w8
-    mov sc_nr, #__NR_syscalls
+    mov sc_nr, #NR_SYSCALLS
     bl enable_irq
     cmp scno, sc_nr // check upper syscall limit
     b.hs ni_sys
