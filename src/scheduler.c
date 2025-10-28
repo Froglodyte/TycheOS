@@ -1,46 +1,92 @@
 #include "scheduler.h"
 
+#include <stdint.h>
+
 #include "irq.h"
 #include "printf.h"
 
 task_struct init = INIT_TASK;
 task_struct* current = &init;
+
 task_struct* tasks[NR_TASKS] = {
     &init,
 };
+
 int curr_task = 1;
 
-void preempt_disable() { current->preempt_count++; };
+void preempt_disable() { current->preempt_count++; }
 
-void preempt_enable() { current->preempt_count--; };
+void preempt_enable() { current->preempt_count--; }
 
-void _schedule() {
-    // write a scheduling function
-    // pick a new task
+static uint64_t rng_state = 88172645463325252ULL;
+
+static uint64_t rng_next(void) {
+    uint64_t x = rng_state;
+    x ^= x << 13;
+    x ^= x >> 7;
+    x ^= x << 17;
+    rng_state = x;
+    return x;
+}
+
+void _schedule(void) {
     preempt_disable();
-    int next, c;
-    struct task_struct* p;
-    while (1) {
-        c = -1;
-        next = 0;
-        for (int i = 0; i < NR_TASKS; i++) {
-            p = tasks[i];
-            if (p && p->state == TASK_RUNNING && p->counter > c) {
-                c = p->counter;
-                next = i;
-            }
-        }
-        if (c) {
+
+    struct task_struct* winner = NULL;
+    unsigned long total_tickets = 0UL;
+
+    for (int i = 0; i < NR_TASKS; ++i) {
+        struct task_struct* p = tasks[i];
+        if (!p)
+            continue;
+        if (p->state != TASK_RUNNING)
+            continue;
+
+        int base = p->priority;
+        if (base < 0)
+            base = 0;
+
+        unsigned long tickets = (unsigned long)(base + (p->counter & 0xff));
+        if (tickets == 0)
+            tickets = 1UL;
+
+        total_tickets += tickets;
+    }
+
+    if (total_tickets == 0UL) {
+        preempt_enable();
+        return;
+    }
+
+    uint64_t r = rng_next();
+    unsigned long win = (unsigned long)(r % total_tickets);
+
+    unsigned long acc = 0UL;
+    for (int i = 0; i < NR_TASKS; ++i) {
+        struct task_struct* p = tasks[i];
+        if (!p)
+            continue;
+        if (p->state != TASK_RUNNING)
+            continue;
+
+        int base = p->priority;
+        if (base < 0)
+            base = 0;
+        unsigned long tickets = (unsigned long)(base + (p->counter & 0xff));
+        if (tickets == 0)
+            tickets = 1UL;
+
+        acc += tickets;
+        if (win < acc) {
+            winner = p;
             break;
         }
-        for (int i = 0; i < NR_TASKS; i++) {
-            p = tasks[i];
-            if (p) {
-                p->counter = (p->counter >> 1) + p->priority;
-            }
-        }
     }
-    switch_to(tasks[next]);
+
+    if (!winner)
+        winner = current;
+
+    switch_to(winner);
     preempt_enable();
 }
 
@@ -60,14 +106,14 @@ void switch_to(struct task_struct* next) {
 void schedule_tail() { preempt_enable(); }
 
 void timer_tick() {
-    // check to see if the first one is ready to be changed?
     current->counter--;
+
     if (current->counter > 0 || current->preempt_count > 0) {
-        // we can't reschedule stuff
-        return;
+        return;  // Still has time left or preemption disabled
     }
-    // time to schedule another process
-    current->counter = 0;  // IMPORTANT to do before the enable
+
+    current->counter = 0;
+
     enable_irq();
     _schedule();
     disable_irq();
