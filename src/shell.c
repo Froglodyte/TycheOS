@@ -34,6 +34,8 @@ static void cmd_help() {
     printf("  touch [name]- Create a file\r\n");
     printf("  cat [name]  - Print file content\r\n");
     printf("  cd [path]   - Change directory (supports . and ..)\r\n");
+    printf("  write [file] [text] - Overwrite file with text\r\n");
+    printf("  append [file] [text]- Append text to file\r\n");
 }
 
 static void cmd_echo(const char *input) {
@@ -178,6 +180,127 @@ static void cmd_cd(const char* path) {
     cwd = node;
 }
 
+static void cmd_write(const char *args) {
+    while (*args == ' ') {
+        args++;
+    }
+    const char *space = strchr(args, ' ');
+    if (!space) {
+        printf("write: missing content (usage: write [file] [content])\r\n");
+        return;
+    }
+    
+    char filename[MAX_FILENAME_LEN];
+    int fn_len = space - args;
+    if (fn_len >= MAX_FILENAME_LEN) {
+        printf("write: filename too long\r\n");
+        return;
+    }
+    strncpy(filename, args, fn_len);
+    filename[fn_len] = '\0';
+    
+    const char *content = space + 1;
+    while (*content == ' ') {
+        content++;
+    }
+    
+    struct file *f = NULL;
+    struct vnode *node = NULL;
+    if (vfs_lookup_at(cwd, filename, &node) != 0) {
+        if (vfs_create_at(cwd, filename, VFS_FILE) != 0) {
+            printf("write: cannot create file %s\r\n", filename);
+            return;
+        }
+    }
+    
+    if (vfs_open_at(cwd, filename, 0, &f) != 0) {
+        printf("write: cannot open file %s\r\n", filename);
+        return;
+    }
+    
+    struct tmpfs_node *tmp_node = (struct tmpfs_node *)f->vnode->internal;
+    if (tmp_node->type == TMPFS_DIR) {
+        printf("write: %s: Is a directory\r\n", filename);
+        vfs_close(f);
+        return;
+    }
+    
+    int written = vfs_write(f, content, strlen(content));
+    if (written < 0) {
+        printf("write: error writing to %s\r\n", filename);
+    }
+    vfs_close(f);
+}
+
+static void cmd_append(const char *args) {
+    while (*args == ' ') {
+        args++;
+    }
+    const char *space = strchr(args, ' ');
+    if (!space) {
+        printf("append: missing content (usage: append [file] [content])\r\n");
+        return;
+    }
+    
+    char filename[MAX_FILENAME_LEN];
+    int fn_len = space - args;
+    if (fn_len >= MAX_FILENAME_LEN) {
+        printf("append: filename too long\r\n");
+        return;
+    }
+    strncpy(filename, args, fn_len);
+    filename[fn_len] = '\0';
+    
+    const char *content = space + 1;
+    while (*content == ' ') {
+        content++;
+    }
+    
+    struct file *f = NULL;
+    struct vnode *node = NULL;
+    if (vfs_lookup_at(cwd, filename, &node) != 0) {
+        if (vfs_create_at(cwd, filename, VFS_FILE) != 0) {
+            printf("append: cannot create file %s\r\n", filename);
+            return;
+        }
+    }
+    
+    if (vfs_open_at(cwd, filename, 0, &f) != 0) {
+        printf("append: cannot open file %s\r\n", filename);
+        return;
+    }
+    
+    struct tmpfs_node *tmp_node = (struct tmpfs_node *)f->vnode->internal;
+    if (tmp_node->type == TMPFS_DIR) {
+        printf("append: %s: Is a directory\r\n", filename);
+        vfs_close(f);
+        return;
+    }
+    
+    char combined_buf[4096];
+    int existing_len = vfs_read(f, combined_buf, sizeof(combined_buf) - 1);
+    if (existing_len < 0) {
+        existing_len = 0;
+    }
+    combined_buf[existing_len] = '\0';
+    
+    int append_len = strlen(content);
+    if (existing_len + append_len >= (int)sizeof(combined_buf)) {
+        printf("append: combined file size exceeds 4KB buffer limit\r\n");
+        vfs_close(f);
+        return;
+    }
+    
+    memcpy(combined_buf + existing_len, content, append_len);
+    combined_buf[existing_len + append_len] = '\0';
+    
+    int written = vfs_write(f, combined_buf, existing_len + append_len);
+    if (written < 0) {
+        printf("append: error writing to %s\r\n", filename);
+    }
+    vfs_close(f);
+}
+
 
 static void run_cmd(char *cmd) {
     // trim trailing spaces of cmd
@@ -242,6 +365,10 @@ static void run_cmd(char *cmd) {
         cmd_cat(cmd + 4);
     } else if (strncmp(cmd, "cd ", 3) == 0 || strcmp(cmd, "cd") == 0) {
         cmd_cd(cmd + (cmd[2] == ' ' ? 3 : 2));
+    } else if (strncmp(cmd, "write ", 6) == 0) {
+        cmd_write(cmd + 6);
+    } else if (strncmp(cmd, "append ", 7) == 0) {
+        cmd_append(cmd + 7);
     } else if (strcmp(cmd, "") == 0) {
         // do nothing
     } else {

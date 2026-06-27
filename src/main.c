@@ -31,6 +31,7 @@ void main() {
     enable_irq();
     memory_init();
     vfs_init();
+    current->cwd = vfs_get_root();
     uart_putc('\r');
     uart_putc('\n');
     //copy_process(PF_KTHREAD, (unsigned long)process, (unsigned long)"12345", 0);

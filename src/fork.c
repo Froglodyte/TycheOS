@@ -34,10 +34,22 @@ int copy_process(unsigned long clone_flags, unsigned long fn, unsigned long arg,
     p->priority = current->priority;
     p->state = TASK_RUNNING;
     p->counter = p->priority;
-    p->preempt_count = 1;  // disable preemtion until schedule_tail
+    p->preempt_count = 1;  // disable preemption until schedule_tail
+    p->cwd = current->cwd; // inherit working directory
+    for (int i = 0; i < MAX_FILES_PER_PROCESS; i++) {
+        p->file_table[i] = 0; // initialize empty FD table
+    }
 
     p->cpu_ctx.lr = (unsigned long)ret_from_fork;
     p->cpu_ctx.sp = (unsigned long)childregs;
+
+    if (curr_task >= NR_TASKS) {
+        // Free allocated page and fail
+        free_page((unsigned long)p);
+        preempt_enable();
+        return -1;
+    }
+
     int pid = curr_task++;
     tasks[pid] = p;
     preempt_enable();

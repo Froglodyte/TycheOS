@@ -30,6 +30,11 @@ struct cpu_ctx {
     unsigned long lr;  // x30 (Link register)
 };
 
+#define MAX_FILES_PER_PROCESS 16
+
+struct file;
+struct vnode;
+
 struct task_struct {
     struct cpu_ctx cpu_ctx;
     long state;          // which state the process is in
@@ -38,6 +43,8 @@ struct task_struct {
     long preempt_count;  // can this be pre-empted. If non-zero we can't!
     unsigned long stack;
     unsigned long flags;
+    struct vnode* cwd;
+    struct file* file_table[MAX_FILES_PER_PROCESS];
 };
 typedef struct task_struct task_struct;
 
@@ -55,7 +62,7 @@ extern void switch_to(task_struct *next);
 extern void cpu_switch_to(task_struct *prev, task_struct *next);
 
 #define INIT_TASK \
-    /*cpu_context*/ {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, /* state etc */ 0, 0, 1, 0}
+    /*cpu_context*/ {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, /* state etc */ 0, 0, 1, 0, 0, 0, 0, {0}}
 
 #endif
 
