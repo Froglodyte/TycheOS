@@ -1,7 +1,6 @@
 #include <stdint.h>
 
 #include "fork.h"
-#include "fs.h"
 #include "irq.h"
 #include "mm.h"
 #include "printf.h"
@@ -10,6 +9,7 @@
 #include "timer.h"
 #include "uart.h"
 #include "utils.h"
+#include "fs.h"
 
 void process(char *array) {
     while (1) {
@@ -33,9 +33,10 @@ void main() {
     vfs_init();
     uart_putc('\r');
     uart_putc('\n');
-    // copy_process((unsigned long)process, (unsigned long)"12345");
-    // copy_process((unsigned long)process, (unsigned long)"abcde");
+    //copy_process(PF_KTHREAD, (unsigned long)process, (unsigned long)"12345", 0);
+    //copy_process(PF_KTHREAD, (unsigned long)process, (unsigned long)"abcde", 0);
     shell();
+
     // kernel must not terminate
     while (1) {
         schedule();

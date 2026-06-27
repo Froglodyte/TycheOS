@@ -33,8 +33,11 @@ struct filesystem {
 void vfs_init();
 struct vnode* vfs_get_root();
 int vfs_lookup(const char* path, struct vnode** node);
+int vfs_lookup_at(struct vnode* base, const char* path, struct vnode** node);
 int vfs_create(const char* path, int type);
+int vfs_create_at(struct vnode* base, const char* path, int type);
 int vfs_open(const char* path, int flags, struct file** file);
+int vfs_open_at(struct vnode* base, const char* path, int flags, struct file** file);
 int vfs_close(struct file* file);
 int vfs_read(struct file* file, void* buf, unsigned int len);
 int vfs_write(struct file* file, const void* buf, unsigned int len);
