@@ -33,7 +33,8 @@ int copy_process(unsigned long clone_flags, unsigned long fn, unsigned long arg,
     p->flags = clone_flags;
     p->priority = current->priority;
     p->state = TASK_RUNNING;
-    p->counter = p->priority;
+    p->queue_level = 0;
+    p->counter = queue_timeslices[0];
     p->preempt_count = 1;  // disable preemption until schedule_tail
     p->cwd = current->cwd; // inherit working directory
     for (int i = 0; i < MAX_FILES_PER_PROCESS; i++) {

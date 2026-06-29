@@ -18,9 +18,9 @@ TycheOS is designed to run on the emulated **Raspberry Pi 3 Model B** (utilizing
 * **Preemptive & Cooperative Timer Interrupts:** Integrates the Raspberry Pi System Timer interrupt to drive the scheduler's quantum tick.
 * **Implementation:** Defined in [entry.S](file:///home/mudit/Desktop/TycheOS/src/entry.S) and managed in [irq.c](file:///home/mudit/Desktop/TycheOS/src/irq.c#L23) and [timer.c](file:///home/mudit/Desktop/TycheOS/src/timer.c#L12).
 
-### 3. Priority-Based Multitasking & Scheduler
+### 3. Multi-Level Feedback Queue (MLFQ) Scheduler
 * **State Management:** Fully supports thread creation via [copy_process](file:///home/mudit/Desktop/TycheOS/src/fork.c#L9) (cloning registers and stack state).
-* **Timesliced Scheduling:** Features a priority-driven scheduler ([_schedule](file:///home/mudit/Desktop/TycheOS/src/scheduler.c#L17)) supporting preemption control counters (`preempt_disable`/`preempt_enable`).
+* **MLFQ Scheduling:** Features a 3-level Multi-Level Feedback Queue scheduler ([_schedule](file:///home/mudit/Desktop/TycheOS/src/scheduler.c#L4)) supporting priority boosting, timeslice demotion (quantum sizes: 2, 4, 8 ticks), and preemption.
 * **Context Switching:** Performs low-level context switches via assembly register saves (x19-x29, SP, and LR).
 * **Implementation:** Managed in [scheduler.c](file:///home/mudit/Desktop/TycheOS/src/scheduler.c) and [fork.c](file:///home/mudit/Desktop/TycheOS/src/fork.c).
 

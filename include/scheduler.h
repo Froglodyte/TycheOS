@@ -12,7 +12,7 @@
 // x19 to x28 are callee saved
 // x9 to x15 are caller saved
 /**
- * The order of the fields is extremely important cause cpu_switch_to depends on it!
+ * The order of the fields is extremely important cuz cpu_switch_to depends on it
  */
 struct cpu_ctx {
     unsigned long x19;
@@ -45,6 +45,7 @@ struct task_struct {
     unsigned long flags;
     struct vnode* cwd;
     struct file* file_table[MAX_FILES_PER_PROCESS];
+    long queue_level;    // MLFQ level: 0 (highest) to MLFQ_QUEUES - 1 (lowest)
 };
 typedef struct task_struct task_struct;
 
@@ -61,8 +62,12 @@ extern void preempt_enable(void);
 extern void switch_to(task_struct *next);
 extern void cpu_switch_to(task_struct *prev, task_struct *next);
 
+#define MLFQ_QUEUES 3
+extern const int queue_timeslices[MLFQ_QUEUES];
+#define BOOST_INTERVAL 100
+
 #define INIT_TASK \
-    /*cpu_context*/ {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, /* state etc */ 0, 0, 1, 0, 0, 0, 0, {0}}
+    /*cpu_context*/ {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, /* state etc */ 0, 0, 1, 0, 0, 0, 0, {0}, 0}
 
 #endif
 

@@ -18,73 +18,43 @@ void preempt_disable() { current->preempt_count++; }
 
 void preempt_enable() { current->preempt_count--; }
 
-static uint64_t rng_state = 88172645463325252ULL;
-
-static uint64_t rng_next(void) {
-    uint64_t x = rng_state;
-    x ^= x << 13;
-    x ^= x >> 7;
-    x ^= x << 17;
-    rng_state = x;
-    return x;
-}
+const int queue_timeslices[MLFQ_QUEUES] = {2, 4, 8};
+static unsigned long global_ticks = 0;
 
 void _schedule(void) {
     preempt_disable();
 
-    struct task_struct* winner = NULL;
-    unsigned long total_tickets = 0UL;
-
+    int current_idx = 0;
     for (int i = 0; i < NR_TASKS; ++i) {
-        struct task_struct* p = tasks[i];
-        if (!p)
-            continue;
-        if (p->state != TASK_RUNNING)
-            continue;
-
-        int base = p->priority;
-        if (base < 0)
-            base = 0;
-
-        unsigned long tickets = (unsigned long)(base + (p->counter & 0xff));
-        if (tickets == 0)
-            tickets = 1UL;
-
-        total_tickets += tickets;
-    }
-
-    if (total_tickets == 0UL) {
-        preempt_enable();
-        return;
-    }
-
-    uint64_t r = rng_next();
-    unsigned long win = (unsigned long)(r % total_tickets);
-
-    unsigned long acc = 0UL;
-    for (int i = 0; i < NR_TASKS; ++i) {
-        struct task_struct* p = tasks[i];
-        if (!p)
-            continue;
-        if (p->state != TASK_RUNNING)
-            continue;
-
-        int base = p->priority;
-        if (base < 0)
-            base = 0;
-        unsigned long tickets = (unsigned long)(base + (p->counter & 0xff));
-        if (tickets == 0)
-            tickets = 1UL;
-
-        acc += tickets;
-        if (win < acc) {
-            winner = p;
+        if (tasks[i] == current) {
+            current_idx = i;
             break;
         }
     }
 
-    if (!winner)
+    struct task_struct* winner = NULL;
+    for (int q = 0; q < MLFQ_QUEUES; ++q) {
+        // Search in a round-robin fashion starting from the next task
+        for (int i = 1; i <= NR_TASKS; ++i) {
+            int idx = (current_idx + i) % NR_TASKS;
+            struct task_struct* p = tasks[idx];
+            if (p && p->state == TASK_RUNNING && p->queue_level == q) {
+                winner = p;
+                break;
+            }
+        }
+        if (winner) {
+            break;
+        }
+    }
+
+    if (!winner) {
         winner = current;
+    }
+
+    if (winner->counter <= 0) {
+        winner->counter = queue_timeslices[winner->queue_level];
+    }
 
     switch_to(winner);
     preempt_enable();
@@ -106,15 +76,48 @@ void switch_to(struct task_struct* next) {
 void schedule_tail() { preempt_enable(); }
 
 void timer_tick() {
-    current->counter--;
-
-    if (current->counter > 0 || current->preempt_count > 0) {
-        return;  // Still has time left or preemption disabled
+    global_ticks++;
+    if (global_ticks >= BOOST_INTERVAL) {
+        global_ticks = 0;
+        // Boost all processes to the highest priority queue
+        for (int i = 0; i < NR_TASKS; ++i) {
+            if (tasks[i]) {
+                tasks[i]->queue_level = 0;
+                tasks[i]->counter = queue_timeslices[0];
+            }
+        }
     }
 
-    current->counter = 0;
+    current->counter--;
 
-    enable_irq();
-    _schedule();
-    disable_irq();
+    if (current->counter <= 0) {
+        // Demote current task if timeslice is exhausted
+        if (current->queue_level < MLFQ_QUEUES - 1) {
+            current->queue_level++;
+        }
+        current->counter = queue_timeslices[current->queue_level];
+
+        if (current->preempt_count > 0) {
+            return;
+        }
+
+        enable_irq();
+        _schedule();
+        disable_irq();
+    } else if (current->preempt_count == 0) {
+        // Check if a higher priority task is ready to preempt the current task
+        int preempt = 0;
+        for (int i = 0; i < NR_TASKS; ++i) {
+            struct task_struct* p = tasks[i];
+            if (p && p->state == TASK_RUNNING && p->queue_level < current->queue_level) {
+                preempt = 1;
+                break;
+            }
+        }
+        if (preempt) {
+            enable_irq();
+            _schedule();
+            disable_irq();
+        }
+    }
 }
